@@ -62,7 +62,8 @@ async def answer(request:Request):
         result=sorted(g,key=lambda k:(-g[k],k));return {'answer':result[0] if result else ''}
     if 'customer' in s and any(x in s for x in ['unique','distinct','how many','number']):return {'answer':len(set(r['customer'] for r in rows))}
     if any(x in s for x in ['units','quantity']):return {'answer':sum(r['qty'] for r in rows)}
-    if any(x in s for x in ['how many','count','number of','total orders']):return {'answer':len(rows)}
+    is_average=any(x in s for x in ['average','mean','aov'])
+    if not is_average and any(x in s for x in ['how many','count','number of','total orders']):return {'answer':len(rows)}
     value=sum(money(r) for r in rows)
-    if any(x in s for x in ['average','mean','aov']):value=value/len(rows) if rows else 0
+    if is_average:value=value/len(rows) if rows else 0
     return {'answer':round(value,2)}
